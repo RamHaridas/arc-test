@@ -1,0 +1,22 @@
+Please refactor this Terraform module to address the following three architectural changes. The goal is to make this a reusable "arc-region-switch" module.
+
+1. Replace the ARC Cluster Resource with a Data Source**
+* The ARC cluster is RAM-shared and already exists. 
+* Find and remove the `aws_route53recoverycontrolconfig_cluster` resource block.
+* Replace it with a `data "aws_route53recoverycontrolconfig_cluster"` block. 
+* Add a variable `cluster_name` (or ARN) so the user can pass in the existing shared cluster identifier.
+* Update all downstream references in the routing control resources to point to this new data block's ARN instead of the old resource.
+
+2. Implement `for_each` for Multiple Routing Controls**
+* The module needs to support creating multiple routing controls, CloudWatch alarms, and Lambda triggers in a single module call.
+* In `variables.tf`, create a new variable called `routing_controls` of type `map(object({...}))` that accepts configurations for each control (e.g., control name, alarm thresholds).
+* Update the `aws_route53recoverycontrolconfig_routing_control` resource to use `for_each = var.routing_controls`.
+* Update the `aws_cloudwatch_metric_alarm` and any associated Lambda event source mapping/trigger resources to also use `for_each`, ensuring an alarm and trigger are created for every routing control in the map.
+
+3. Remove Slack Webhook and Decouple Alerting**
+* This module must be generically reusable. Find and completely remove all resources, variables, and data blocks related to the `arcalert` Slack webhook.
+* In `variables.tf`, add a new string variable called `sns_alert_topic_arn`.
+* In the `aws_cloudwatch_metric_alarm` resource, update the `alarm_actions` list to route alerts to `var.sns_alert_topic_arn`. 
+* Ensure there are no lingering hardcoded references to Slack or specific team alerting methods.
+
+Please update `main.tf`, `variables.tf`, and `outputs.tf` accordingly and show me the refactored code.
