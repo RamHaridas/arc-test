@@ -15,9 +15,11 @@ Please modify the Terraform module to implement the following orchestration arch
    - Create a boolean variable `enable_failover_scripts` (default: false).
    - Create a list of strings variable `failover_scripts` (default: []) where users can define specific recovery scripts they need to run.
 
-2. Add an Orchestrator AWS Lambda Function:
+2. Add an Orchestrator AWS Lambda Function (Conditional Creation):
    - Provision a new AWS Lambda function that will act as the "brain" of the failover orchestration.
-   - Configure the existing CloudWatch event/alarm (or the existing SNS topic) to trigger this Lambda function.
+   - IMPORTANT: This Lambda function and its related resources (IAM roles, permissions, event targets) should ONLY be created if the user provides `failover_scripts` (e.g., using `count = length(var.failover_scripts) > 0 ? 1 : 0`).
+   - If no scripts are provided, the module should default to just sending the alert to the SNS topic without provisioning the Lambda.
+   - If created, configure the existing CloudWatch event/alarm (or the existing SNS topic) to trigger this Lambda function.
    - Pass the new variables (`enable_failover_scripts` and `failover_scripts`) into the Lambda function as environment variables.
 
 3. Configure IAM Permissions:
