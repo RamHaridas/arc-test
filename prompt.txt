@@ -1,22 +1,36 @@
-Please refactor this Terraform module to address the following three architectural changes. The goal is to make this a reusable "arc-region-switch" module.
+Role & Goal:
+You are an expert AWS Terraform and Python developer. I have an existing Terraform module for AWS ARC (Application Recovery Controller) that currently acts as a simple alerting mechanism. I need you to upgrade this module into a flexible "failover orchestration framework."
 
-1. Replace the ARC Cluster Resource with a Data Source**
-* The ARC cluster is RAM-shared and already exists. 
-* Find and remove the `aws_route53recoverycontrolconfig_cluster` resource block.
-* Replace it with a `data "aws_route53recoverycontrolconfig_cluster"` block. 
-* Add a variable `cluster_name` (or ARN) so the user can pass in the existing shared cluster identifier.
-* Update all downstream references in the routing control resources to point to this new data block's ARN instead of the old resource.
+Current State of the Terraform Module:
+1. Reads an ARC cluster ARN as a variable.
+2. Creates a CloudWatch alarm to listen for an ARC routing control failover event.
+3. On alarm, it sends an alert to an SNS topic. 
+4. Scan the workspace to understand more, above points may or may not be accurate.
+*Note: There is currently NO Lambda function present in the module.*
 
-2. Implement `for_each` for Multiple Routing Controls**
-* The module needs to support creating multiple routing controls, CloudWatch alarms, and Lambda triggers in a single module call.
-* In `variables.tf`, create a new variable called `routing_controls` of type `map(object({...}))` that accepts configurations for each control (e.g., control name, alarm thresholds).
-* Update the `aws_route53recoverycontrolconfig_routing_control` resource to use `for_each = var.routing_controls`.
-* Update the `aws_cloudwatch_metric_alarm` and any associated Lambda event source mapping/trigger resources to also use `for_each`, ensuring an alarm and trigger are created for every routing control in the map.
+Required Updates:
+Please modify the Terraform module to implement the following orchestration architecture:
 
-3. Remove Slack Webhook and Decouple Alerting**
-* This module must be generically reusable. Find and completely remove all resources, variables, and data blocks related to the `arcalert` Slack webhook.
-* In `variables.tf`, add a new string variable called `sns_alert_topic_arn`.
-* In the `aws_cloudwatch_metric_alarm` resource, update the `alarm_actions` list to route alerts to `var.sns_alert_topic_arn`. 
-* Ensure there are no lingering hardcoded references to Slack or specific team alerting methods.
+1. Add Optional Configuration Variables:
+   - Create a boolean variable `enable_failover_scripts` (default: false).
+   - Create a list of strings variable `failover_scripts` (default: []) where users can define specific recovery scripts they need to run.
 
-Please update `main.tf`, `variables.tf`, and `outputs.tf` accordingly and show me the refactored code.
+2. Add an Orchestrator AWS Lambda Function:
+   - Provision a new AWS Lambda function that will act as the "brain" of the failover orchestration.
+   - Configure the existing CloudWatch event/alarm (or the existing SNS topic) to trigger this Lambda function.
+   - Pass the new variables (`enable_failover_scripts` and `failover_scripts`) into the Lambda function as environment variables.
+
+3. Configure IAM Permissions:
+   - Create an IAM Role and Policy for the Lambda function.
+   - The policy must grant the Lambda basic execution rights, permission to publish notifications, and generic permissions to update infrastructure via API calls (you can use placeholder permissions for the infrastructure updates, adding comments on where I should restrict them).
+
+4. Provide the Lambda Source Code Scaffolding (Python):
+   - Write the handler code that:
+     a) Reads the environment variables to check if `enable_failover_scripts` is set to true.
+     b) If true, parses the `failover_scripts` list and executes them in sequential order (simulate this logic if actual scripts are external).
+     c) Sends out a notification (e.g., to Datadog or the existing SNS topic) once the recovery orchestration completes successfully or if it fails.
+
+Output Requirements:
+- Provide the updated Terraform configuration files.
+- Provide the source code for the Lambda function (lambda_function.py).
+- Ensure the code is production-ready, well-commented, and keeps the automation strictly optional so teams who only want monitoring alerts aren't forced into running scripts.
