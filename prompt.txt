@@ -1,38 +1,28 @@
-Role & Goal:
-You are an expert AWS Terraform and Python developer. I have an existing Terraform module for AWS ARC (Application Recovery Controller) that currently acts as a simple alerting mechanism. I need you to upgrade this module into a flexible "failover orchestration framework."
+# Context
+We have a Terraform module that currently sets up AWS Application Recovery Controller (ARC) routing controls and monitors failover events. Currently, it uses CloudWatch Alarms to trigger a Lambda function that is user defined. 
 
-Current State of the Terraform Module:
-1. Reads an ARC cluster ARN as a variable.
-2. Creates a CloudWatch alarm to listen for an ARC routing control failover event.
-3. On alarm, it sends an alert to an SNS topic. 
-4. Scan the workspace to understand more, above points may or may not be accurate.
-*Note: There is currently NO Lambda function present in the module.*
+# Goal
+We want to completely **remove the AWS Lambda function from the equation**. We will replace the entire execution layer with **AWS Systems Manager (SSM) Automation**. The CloudWatch Alarm will trigger the SSM Automation Runbook directly.
 
-Required Updates:
-Please modify the Terraform module to implement the following orchestration architecture:
+This new SSM Runbook will handle the optional orchestration of failover scripts defined by the user, centralizing all logic into a single SSM Document managed by Terraform.
 
-1. Add Optional Configuration Variables:
-   - Create a boolean variable `enable_failover_scripts` (default: false).
-   - Create a list of strings variable `failover_scripts` (default: []) where users can define specific recovery scripts they need to run.
+# Requirements
+1. **Remove Lambda**: Completely strip out all Terraform resources related to the Lambda function (`aws_lambda_function`, `aws_lambda_permission`, etc.) and delete the Python source code directory.
+2. **Backward Compatibility**: Introduce Terraform variables (e.g., `enable_failover_automation` (bool) and `failover_scripts` (list)) to allow users to opt-in to the automation. By default, the SSM Runbook should skip.
+3. **SSM Automation Integration**: 
+   - Provision an SSM Automation Document via Terraform.
+   - Reconfigure the CloudWatch Alarm so that when an ARC failover event occurs, they trigger the SSM Automation Runbook directly.
+4. **Execution Flow**:
+   - The SSM Document should have conditional steps based on the Terraform variables. 
+   - If automation is enabled, it sequentially executes the provided scripts (e.g., using `aws:runCommand`).
+   - The path to this script will be provided by the user.
+   - The final step of the SSM Document (or the only step if automation is disabled) should use the `aws:executeScript` action. This replaces the need for an external Lambda for notifications.
+5. **IAM Role Updates**: Ensure CloudWatch have the `ssm:StartAutomationExecution` permissions to trigger the runbook, and ensure the SSM service role has the permissions to execute the run commands and make outbound HTTP requests.
 
-2. Add an Orchestrator AWS Lambda Function (Conditional Creation):
-   - Provision a new AWS Lambda function that will act as the "brain" of the failover orchestration.
-   - IMPORTANT: This Lambda function and its related resources (IAM roles, permissions, event targets) should ONLY be created if the user provides `failover_scripts` (e.g., using `count = length(var.failover_scripts) > 0 ? 1 : 0`).
-   - If no scripts are provided, the module should default to just sending the alert to the SNS topic without provisioning the Lambda.
-   - If created, configure the existing CloudWatch event/alarm (or the existing SNS topic) to trigger this Lambda function.
-   - Pass the new variables (`enable_failover_scripts` and `failover_scripts`) into the Lambda function as environment variables.
-
-3. Configure IAM Permissions:
-   - Create an IAM Role and Policy for the Lambda function.
-   - The policy must grant the Lambda basic execution rights, permission to publish notifications, and generic permissions to update infrastructure via API calls (you can use placeholder permissions for the infrastructure updates, adding comments on where I should restrict them).
-
-4. Provide the Lambda Source Code Scaffolding (Python):
-   - Write the handler code that:
-     a) Reads the environment variables to check if `enable_failover_scripts` is set to true.
-     b) If true, parses the `failover_scripts` list and executes them in sequential order (simulate this logic if actual scripts are external).
-     c) Sends out a notification (e.g., to Datadog or the existing SNS topic) once the recovery orchestration completes successfully or if it fails.
-
-Output Requirements:
-- Provide the updated Terraform configuration files.
-- Provide the source code for the Lambda function (lambda_function.py).
-- Ensure the code is production-ready, well-commented, and keeps the automation strictly optional so teams who only want monitoring alerts aren't forced into running scripts.
+# Instructions
+1. Analyze the existing .tf scripts to understand the current triggers.
+2. Delete `lambda.tf` and the `src/` directory containing the old Python code.
+3. Create a new `ssm.tf` file to define the SSM Automation Document and its associated IAM roles. Implement the `aws:executeScript` block inside the SSM Document.
+4. Update `variables.tf` to include the new optional toggles.
+5. Update `cloudwatch.tf` to route the Alarm and EventBridge triggers to the new SSM Automation Runbook instead of Lambda.
+6. Provide a summary of the changes and the updated HCL code.
