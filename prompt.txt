@@ -1,28 +1,25 @@
-# Context
-We have a Terraform module that currently sets up AWS Application Recovery Controller (ARC) routing controls and monitors failover events. Currently, it uses CloudWatch Alarms to trigger a Lambda function that is user defined. 
+Background:
+In this workspace we have multiple Terraform files inside unity_catalog directory
+which are used to create aws and databricks related resources. 
+Now, the issue is that these terraform scripts are not properly segregated based on environments,
+they are used to create resources for qa, dev, and prod. We have to identify all such resources which belong 
+to dev and then safely move them to a different folder. 
 
-# Goal
-We want to completely **remove the AWS Lambda function from the equation**. We will replace the entire execution layer with **AWS Systems Manager (SSM) Automation**. The CloudWatch Alarm will trigger the SSM Automation Runbook directly.
+Excpecation:
+- Every databricks related resource will move to infrastructure/terraform/aws/environments/databrocks
+- And, every aws related resource (non-databricks) will move to nfrastructure/terraform/aws/environments/data-databricks-dev
+- Before moving, we have to safely identify the right place where this can be moved without affecting
+   the existing functonality of source and destination terraform scripts.
 
-This new SSM Runbook will handle the optional orchestration of failover scripts defined by the user, centralizing all logic into a single SSM Document managed by Terraform.
 
-# Requirements
-1. **Remove Lambda**: Completely strip out all Terraform resources related to the Lambda function (`aws_lambda_function`, `aws_lambda_permission`, etc.) and delete the Python source code directory.
-2. **Backward Compatibility**: Introduce Terraform variables (e.g., `enable_failover_automation` (bool) and `failover_scripts` (list)) to allow users to opt-in to the automation. By default, the SSM Runbook should skip.
-3. **SSM Automation Integration**: 
-   - Provision an SSM Automation Document via Terraform.
-   - Reconfigure the CloudWatch Alarm so that when an ARC failover event occurs, they trigger the SSM Automation Runbook directly.
-4. **Execution Flow**:
-   - The SSM Document should have conditional steps based on the Terraform variables. 
-   - If automation is enabled, it sequentially executes the provided scripts (e.g., using `aws:runCommand`).
-   - The path to this script will be provided by the user.
-   - The final step of the SSM Document (or the only step if automation is disabled) should use the `aws:executeScript` action. This replaces the need for an external Lambda for notifications.
-5. **IAM Role Updates**: Ensure CloudWatch have the `ssm:StartAutomationExecution` permissions to trigger the runbook, and ensure the SSM service role has the permissions to execute the run commands and make outbound HTTP requests.
+Objective:
+You need to identify all such resoueces in unity_catalog that belongs to dev environment and needs to be moved.
+Once you have listed out, please create a md file with detailed information of resources that needs to be moved.
+I will read and review this document first.
 
-# Instructions
-1. Analyze the existing .tf scripts to understand the current triggers.
-2. Delete `lambda.tf` and the `src/` directory containing the old Python code.
-3. Create a new `ssm.tf` file to define the SSM Automation Document and its associated IAM roles. Implement the `aws:executeScript` block inside the SSM Document.
-4. Update `variables.tf` to include the new optional toggles.
-5. Update `cloudwatch.tf` to route the Alarm and EventBridge triggers to the new SSM Automation Runbook instead of Lambda.
-6. Provide a summary of the changes and the updated HCL code.
+Implemetation Strategy:
+This looks like a very big task and implmenting it in a single go will not be a good idea since a lot of 
+things might break after migration, making it difficult for me to isolate the root cause of failure.
+Hence, I want you to group such resources and come up with a 3 stage plan to implement the migration.
+such that, we can execute stage 1, then i can test and if everything is ok then we move to next stage and so on.
+
