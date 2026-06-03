@@ -1,25 +1,15 @@
-Background:
-In this workspace we have multiple Terraform files inside unity_catalog directory
-which are used to create aws and databricks related resources. 
-Now, the issue is that these terraform scripts are not properly segregated based on environments,
-they are used to create resources for qa, dev, and prod. We have to identify all such resources which belong 
-to dev and then safely move them to a different folder. 
+I want to integrate an AWS Route 53 HTTPS health check for Databricks into my existing Terraform module. 
 
-Excpecation:
-- Every databricks related resource will move to infrastructure/terraform/aws/environments/databrocks
-- And, every aws related resource (non-databricks) will move to nfrastructure/terraform/aws/environments/data-databricks-dev
-- Before moving, we have to safely identify the right place where this can be moved without affecting
-   the existing functonality of source and destination terraform scripts.
+Please modify my existing files to include this infrastructure:
 
+1. Existing [main.tf / resources.tf]: Append an `aws_route53_health_check` pointing to a Databricks workspace URL, an `aws_cloudwatch_metric_alarm` tracking `HealthCheckStatus`, and an `aws_sns_topic` with an `aws_sns_topic_subscription` for email alerts.
+2. Existing [variables.tf]: Add variables for the Databricks endpoint, the health check path (defaulting to "/login.html"), and the alert email.
+3. Existing [outputs.tf]: Expose the health check ID and SNS topic ARN.
 
-Objective:
-You need to identify all such resoueces in unity_catalog that belongs to dev environment and needs to be moved.
-Once you have listed out, please create a md file with detailed information of resources that needs to be moved.
-I will read and review this document first.
+Requirements:
+- Make sure to use `for_each` or dynamic blocks if this needs to handle multiple workspaces (Optional: Specify if you want this).
+- Ensure the Route 53 resources and alarms are explicitly tied to the `us-east-1` provider if the rest of the module runs in a different region.
+- Match the naming conventions, linting, and formatting of my existing code.
 
-Implemetation Strategy:
-This looks like a very big task and implmenting it in a single go will not be a good idea since a lot of 
-things might break after migration, making it difficult for me to isolate the root cause of failure.
-Hence, I want you to group such resources and come up with a 3 stage plan to implement the migration.
-such that, we can execute stage 1, then i can test and if everything is ok then we move to next stage and so on.
-
+Here is my current module code:
+[Paste your existing main.tf, variables.tf, and outputs.tf here]
