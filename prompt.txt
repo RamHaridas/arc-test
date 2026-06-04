@@ -1,15 +1,33 @@
-I want to integrate an AWS Route 53 HTTPS health check for Databricks into my existing Terraform module. 
+**System Role:** You are an expert Cloud Infrastructure and Terraform engineer.
 
-Please modify my existing files to include this infrastructure:
+**Context:** 
+We currently have a reusable Terraform module that wraps the `aws_arcregionswitch_plan` resource. Currently, this module only supports basic workflows and `ManualApproval` step executions. 
 
-1. Existing [main.tf / resources.tf]: Append an `aws_route53_health_check` pointing to a Databricks workspace URL, an `aws_cloudwatch_metric_alarm` tracking `HealthCheckStatus`, and an `aws_sns_topic` with an `aws_sns_topic_subscription` for email alerts.
-2. Existing [variables.tf]: Add variables for the Databricks endpoint, the health check path (defaulting to "/login.html"), and the alert email.
-3. Existing [outputs.tf]: Expose the health check ID and SNS topic ARN.
+**Objective:**
+I received the following review comment from my manager regarding the workflows our module needs to support:
+> *"Great, let's go ahead and add these steps: Deactivate Routing Control for DBX Workspace in us-east-1 (data-eng-dev) -> Run the astro failover script (we can have it run inside a lambda for now) -> Manual approval gate -> Activate Routing Control for DBX Workspace in us-east-2 (dev-testing-dr). You can manually provision the lambda in the console and just invoke it from the plan for now. We can get it all integrated and working tomorrow morning."*
 
-Requirements:
-- Make sure to use `for_each` or dynamic blocks if this needs to handle multiple workspaces (Optional: Specify if you want this).
-- Ensure the Route 53 resources and alarms are explicitly tied to the `us-east-1` provider if the rest of the module runs in a different region.
-- Match the naming conventions, linting, and formatting of my existing code.
+**Tasks:**
+Please update our existing Terraform module to address this review comment. I need you to do the following:
 
-Here is my current module code:
-[Paste your existing main.tf, variables.tf, and outputs.tf here]
+1. **Update `variables.tf`:** 
+   - Modify the `workflows` variable (which is a list of objects).
+   - Inside the `steps` object, add optional configurations to support the new block types: 
+     - Add `execution_custom_action_config` (optional object with `target_arn`). This is for the Astro failover Lambda.
+     - Add `arc_routing_control_config` (optional object with `target_arn` and `state`). This is for the DBX Routing Controls.
+
+2. **Update `main.tf`:**
+   - In the `aws_arcregionswitch_plan` resource, find the `dynamic "step"` block.
+   - Add a `dynamic "execution_custom_action_config"` block that processes the newly added variable if it is not null.
+   - Add a `dynamic "arc_routing_control_config"` block that processes the newly added routing control variable if it is not null.
+
+3. **Generate a Usage Example:**
+   - Examples partially exist, so only update on top of it, no need to create from scratch.
+   - Create a directory called `examples/`, if not exists already.
+   - Create a `main.tf` inside that directory that invokes this updated module (`source = "../../"`).
+   - The module invocation must define a workflow that exactly mirrors my manager's request (4 steps: ARCRoutingControl set to Off for us-east-1 -> CustomActionLambda for the Astro script -> ManualApproval -> ARCRoutingControl set to On for us-east-2). 
+   - Do not hardcode the ARNs in the example; create a `variables.tf` in the example directory that accepts ARNs for the Lambda and both Routing Controls, and pass those variables into the module call.
+
+**Constraints:**
+- Ensure all Terraform syntax uses HCL2 standard formatting.
+- Ensure the dynamic blocks gracefully handle omitted (null) configurations so backward compatibility with existing module consumers is not broken.
