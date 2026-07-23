@@ -32,6 +32,10 @@ Please update our existing Terraform module to address this review comment. I ne
 - Ensure all Terraform syntax uses HCL2 standard formatting.
 - Ensure the dynamic blocks gracefully handle omitted (null) configurations so backward compatibility with existing module consumers is not broken.
 
+echo -n "YOUR_EMAIL_OR_USERNAME:github_pat_11CJIKCSA0SW3Zpcf4gsf_TzgAcdPpT5671o8ThOL1NRN3AhL6DYuxEOc6MmK5gLoIHA6AOEBqMkJChmZ" | base64
 
-echo "//artifactory.fis.dev/artifactory/bsd-npm-dev/%40forge/:_authToken=github_pat_11CJIKCSA0SW3Zpcf4gsf_TzgAcdPpT5671o8ThOL1NRN3AhL6DYuxEOc6MmK5gLoIHA6AOEBqMkJChmZ" >> .npmrc
+@bsd:registry=https://artifactory.fis.dev/artifactory/api/npm/bsd-npm-dev/
+
+# Use _auth with the base64 string you generated above
+//artifactory.fis.dev/artifactory/api/npm/bsd-npm-dev/:_auth=YOUR_GENERATED_BASE64_STRING
 
