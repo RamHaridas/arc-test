@@ -31,3 +31,7 @@ Please update our existing Terraform module to address this review comment. I ne
 **Constraints:**
 - Ensure all Terraform syntax uses HCL2 standard formatting.
 - Ensure the dynamic blocks gracefully handle omitted (null) configurations so backward compatibility with existing module consumers is not broken.
+
+
+sed -i '' 's/always-auth=true/always-auth=false/g' .npmrc
+
