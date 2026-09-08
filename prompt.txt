@@ -26,10 +26,9 @@ Please follow these rules for this chat:
 
 ---
 
-Hi, 
-
-please read @globaldb-rds-aurora.tf to gain context regarding the terraform script to generate global db.
-
-We have replicated this script to @zelle-uat-globaldb-rds-aurora.tf to create an aurora db for zelle project. We have to make sure that this new script only creates db with zelle-uat prefix and all the name specific aws resources for that matter. 
-Can you analyze and make the changes and most importantly check if any changes have to be made outside this file, if yes then list those with reasoning on why they are needed. 
-Also please analyze this workspace and directory structure to understand the existing patterns and designs and choose the best approach. 
+1. keep KMS part as is.
+2. leave this as is for now.
+3. move the local and variable username to _local and _variable tf files. just make sure that the variable names are unique as well to avoid conflict. instead of adding local section inside current tf script. 
+4. this also we can update in _data but keep a unique name for zelle
+5. i am not sure what external file change are needed here?
+6. that's okay
