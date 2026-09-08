@@ -1,41 +1,35 @@
-**System Role:** You are an expert Cloud Infrastructure and Terraform engineer.
+Please follow these rules for this chat:
+ 
+1) Keep responses short, crisp, and straight to the point.
 
-**Context:** 
-We currently have a reusable Terraform module that wraps the `aws_arcregionswitch_plan` resource. Currently, this module only supports basic workflows and `ManualApproval` step executions. 
+2) No assumptions. Evidence only from files/logs/commands.
 
-**Objective:**
-I received the following review comment from my manager regarding the workflows our module needs to support:
-> *"Great, let's go ahead and add these steps: Deactivate Routing Control for DBX Workspace in us-east-1 (data-eng-dev) -> Run the astro failover script (we can have it run inside a lambda for now) -> Manual approval gate -> Activate Routing Control for DBX Workspace in us-east-2 (dev-testing-dr). You can manually provision the lambda in the console and just invoke it from the plan for now. We can get it all integrated and working tomorrow morning."*
+3) If unsure, explicitly say “unknown” (don’t guess).
 
-**Tasks:**
-Please update our existing Terraform module to address this review comment. I need you to do the following:
+4) Before suggesting a fix, show exact supporting evidence (quoted lines/paths).
 
-1. **Update `variables.tf`:** 
-   - Modify the `workflows` variable (which is a list of objects).
-   - Inside the `steps` object, add optional configurations to support the new block types: 
-     - Add `execution_custom_action_config` (optional object with `target_arn`). This is for the Astro failover Lambda.
-     - Add `arc_routing_control_config` (optional object with `target_arn` and `state`). This is for the DBX Routing Controls.
+5) Use this format when analyzing issues:
 
-2. **Update `main.tf`:**
-   - In the `aws_arcregionswitch_plan` resource, find the `dynamic "step"` block.
-   - Add a `dynamic "execution_custom_action_config"` block that processes the newly added variable if it is not null.
-   - Add a `dynamic "arc_routing_control_config"` block that processes the newly added routing control variable if it is not null.
+   - Observation (with source)
 
-3. **Generate a Usage Example:**
-   - Examples partially exist, so only update on top of it, no need to create from scratch.
-   - Create a directory called `examples/`, if not exists already.
-   - Create a `main.tf` inside that directory that invokes this updated module (`source = "../../"`).
-   - The module invocation must define a workflow that exactly mirrors my manager's request (4 steps: ARCRoutingControl set to Off for us-east-1 -> CustomActionLambda for the Astro script -> ManualApproval -> ARCRoutingControl set to On for us-east-2). 
-   - Do not hardcode the ARNs in the example; create a `variables.tf` in the example directory that accepts ARNs for the Lambda and both Routing Controls, and pass those variables into the module call.
+   - Inference
 
-**Constraints:**
-- Ensure all Terraform syntax uses HCL2 standard formatting.
-- Ensure the dynamic blocks gracefully handle omitted (null) configurations so backward compatibility with existing module consumers is not broken.
+   - Confidence: High / Medium / Low
 
-echo -n "YOUR_EMAIL_OR_USERNAME:github_pat_11CJIKCSA0SW3Zpcf4gsf_TzgAcdPpT5671o8ThOL1NRN3AhL6DYuxEOc6MmK5gLoIHA6AOEBqMkJChmZ" | base64
+6) Do not apply any code changes unless I explicitly approve.
 
-@bsd:registry=https://artifactory.fis.dev/artifactory/api/npm/bsd-npm-dev/
+7) If confidence is not High, run verification checks first and report results.
 
-# Use _auth with the base64 string you generated above
-//artifactory.fis.dev/artifactory/api/npm/bsd-npm-dev/:_auth=YOUR_GENERATED_BASE64_STRING
+8) For factual/behavioral claims not provable from local repo/logs, do a web search for fact-checking before answering, and cite the source link(s).
 
+9) If web evidence conflicts with local evidence, call out the conflict clearly.
+
+---
+
+Hi, 
+
+please read @globaldb-rds-aurora.tf to gain context regarding the terraform script to generate global db.
+
+We have replicated this script to @zelle-uat-globaldb-rds-aurora.tf to create an aurora db for zelle project. We have to make sure that this new script only creates db with zelle-uat prefix and all the name specific aws resources for that matter. 
+Can you analyze and make the changes and most importantly check if any changes have to be made outside this file, if yes then list those with reasoning on why they are needed. 
+Also please analyze this workspace and directory structure to understand the existing patterns and designs and choose the best approach. 
