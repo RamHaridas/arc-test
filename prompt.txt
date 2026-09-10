@@ -26,9 +26,9 @@ Please follow these rules for this chat:
 
 ---
 
-1. keep KMS part as is.
-2. leave this as is for now.
-3. move the local and variable username to _local and _variable tf files. just make sure that the variable names are unique as well to avoid conflict. instead of adding local section inside current tf script. 
-4. this also we can update in _data but keep a unique name for zelle
-5. i am not sure what external file change are needed here?
-6. that's okay
+Hi, 
+
+We have a directory <relative path to ach folder> where multiple terraform scripts are written for creating AWS services. I have replicated that folder into <relative path to zelle folder>. 
+I want you to analyze this folder and make sure that you change every naming convention for "ach" to "zelle", we need change logic as such, ensure the integrity of all scripts. The only activity we need to do is renaming aws resources from ach to zelle. 
+Context behind doing this activity is the fact that ach and zelle both are same applications but being deployed in different environment for different customers. Hence logical separation here in codebase but actual separation in aws cloud.
+If you feel like there are some values where renaming itself will not be enough, then please list them in along with their filename, line no. and a brief context behind them. 
