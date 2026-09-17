@@ -25,8 +25,5 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-Read @Jenkinsfile to gain context regarding the pipeline that we've here. 
-
-I want to add a simple condition here to make sure that whenever this pipeline is triggered by a feature branch (feature-branch/* or feature/* or basically anything that is not master), all the docker push should happen to mmh-docker-dev-local instead of mmh-docker-staging-local. Only when branch is master, dockers must be pushed to mmh-docker-staging-local
-And in the same fashion for helm as well, when the branch is master then push chart to mmh-helm-release-local and for other branches it can go to mmh-local-snapshot-local. 
-
+1.⁠ ⁠don't treat release as non master instead when release/ is used then push to mmh-docker-release-local
+2.⁠ ⁠⁠same logic for helm as docker. feature/ goes to mmh-helm-dev-local, master goes to mmh-helm-staging-local and release/* goes to mmh-helm-release-local
