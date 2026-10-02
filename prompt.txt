@@ -25,5 +25,4 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-1.⁠ ⁠don't treat release as non master instead when release/ is used then push to mmh-docker-release-local
-2.⁠ ⁠⁠same logic for helm as docker. feature/ goes to mmh-helm-dev-local, master goes to mmh-helm-staging-local and release/* goes to mmh-helm-release-local
+Please add a git based trigger for this pipeline. When a commit is pushed for branches with suffix "feature*" then trigger a commit build with that feature branch. When a PR is merged to master branch then trigger a merge build. 
