@@ -25,7 +25,4 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-1. Multibranch pipeline
-2. i am not sure help me figure this out -> <your-jenkins-url>
-3. literal
-4. commit build means when anything is pushed to feature branch and by merge build i meant the same for master branch but you can perceive it any way that fits.
+I have update location from / to /zelle in my nginx.conf but now my web application is not loading assets correctly because it is still trying to fetch assets from base path <pasteurlhere> and returning 404 error.
