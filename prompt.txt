@@ -26,3 +26,15 @@ Please follow these rules for this chat:
 
 ---
 I have update location from / to /zelle in my nginx.conf but now my web application is not loading assets correctly because it is still trying to fetch assets from base path <pasteurlhere> and returning 404 error.
+
+--
+
+Hi 
+
+I have updated the nginx.conf for zelle ui container to change location from / to /zelle. This ensured the application only returns html pages when the request is hit to /zelle endpoint. 
+
+<PASTE SCREENSHOT 1 HERE>
+
+But, the downfall of this is that now the UI assets referenced by the react application is not being fetched correctly because the react app is still expecting the css assets to present at http://baseurl/images/logo.svg, whereas it should be fetching it from http://baseurl/zelle/images/logo.svg
+
+<PASTE SCREENSHOT 2 HERE>
