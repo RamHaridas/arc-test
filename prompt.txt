@@ -31,6 +31,6 @@ I have update location from / to /zelle in my nginx.conf but now my web applicat
 
 Hi 
 
-I have updated the nginx.conf for zelle ui container to change location from / to /mmh. This ensured the application only returns html pages when the request is hit to /mmh endpoint.
+I have updated the nginx.conf for mmh ui container to change location from / to /mmh. This ensured the application only returns html pages when the request is hit to /mmh endpoint.
 
 But it is not working as expected, regardless of the change the baseurl is still responding even without /mmh path at the end. It still redirects to the login page. <paste login url here>
