@@ -25,12 +25,16 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-I have update location from / to /zelle in my nginx.conf but now my web application is not loading assets correctly because it is still trying to fetch assets from base path <pasteurlhere> and returning 404 error.
 
---
+I have a @Jenkinsfile.zelle here which contains the logic for building zelle application. Building zelle application involve below steps
+- creating docker image for zelle
+- creating helm chart for zelle
+- pushing docker image to repo
+- pushing helm chart to repo
 
-Hi 
+The zelle code is present at /path/to/zelle
 
-I have updated the nginx.conf for mmh ui container to change location from / to /mmh. This ensured the application only returns html pages when the request is hit to /mmh endpoint.
+I need you to carefully port these changes to our Jenkinsfile which currently contains the stages to build MMH application. You MUST ensure that these changes in no way should impact our existing MMH stages in Jenkins file. The build and push of zelle must happen independent of MMH within the same pipeline. 
 
-But it is not working as expected, regardless of the change the baseurl is still responding even without /mmh path at the end. It still redirects to the login page. <paste login url here>
+
+
