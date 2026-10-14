@@ -26,15 +26,8 @@ Please follow these rules for this chat:
 
 ---
 
-I have a @Jenkinsfile.zelle here which contains the logic for building zelle application. Building zelle application involve below steps
-- creating docker image for zelle
-- creating helm chart for zelle
-- pushing docker image to repo
-- pushing helm chart to repo
-
-The zelle code is present at /path/to/zelle
-
-I need you to carefully port these changes to our Jenkinsfile which currently contains the stages to build MMH application. You MUST ensure that these changes in no way should impact our existing MMH stages in Jenkins file. The build and push of zelle must happen independent of MMH within the same pipeline. 
+We have migrated our Jenkins server to corporate Jenkins and as part of that we need to migrate existing Jekins pipeline as well. I have @samplejenkins here which is already migrated and running in the new corporate Jenkins, whereas I have my existing Jenkins pipeline which is failing in the new corporate Jenkins with error @build.log. 
+I need you analyze the @samplejenkins file and then make the needful changes in our current jenkinsfile to make it working and also resolve the current error that we're facing. 
 
 
 
