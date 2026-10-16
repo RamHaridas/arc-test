@@ -26,50 +26,59 @@ Please follow these rules for this chat:
 
 ---
 
-You are a code reviewer. Follow these instructions exactly. Do NOT skip any step.
+You are a code editor. Follow these instructions exactly.
 
-## FILES
-- `sampleJenkinsfile` — This is a WORKING, PRODUCTION pipeline that uses `oc` (OpenShift CLI) to build and push container images. Treat this as the REFERENCE / ground truth.
-- `Jenkinsfile` — This is a WORK-IN-PROGRESS pipeline. It has a new stage that uses `oc` to build images. This stage needs to be validated against sampleJenkinsfile.
+## CONTEXT
+You just compared `Jenkinsfile` against `sampleJenkinsfile` and found mismatches
+in the oc build stage. Now you must fix them.
+
+## RULES
+1. `sampleJenkinsfile` is the REFERENCE. It is correct. Do NOT change it.
+2. `Jenkinsfile` is the file you must FIX. Apply changes ONLY to `Jenkinsfile`.
+3. The ONLY stage you may modify is the oc build/image stage. Do NOT touch any other stage.
+4. Do NOT delete or rewrite the entire stage. Make the MINIMUM changes needed to fix each gap.
 
 ## YOUR TASK
 
-### Step 1: Read sampleJenkinsfile
-- Read the ENTIRE sampleJenkinsfile.
-- Identify ALL stages that use `oc` commands (e.g., `oc patch`, `oc start-build`, `oc get`, etc.).
-- For each `oc` command found, note:
-  a) The exact command and its flags
-  b) The JSON patch payload (if any)
-  c) The order in which commands are executed
-  d) Any variables or credentials used
+### Step 1: Re-read both files
+- Read `sampleJenkinsfile` fully. This is your source of truth.
+- Read `Jenkinsfile` fully. This is what you are fixing.
 
-### Step 2: Read Jenkinsfile
-- Read the ENTIRE Jenkinsfile.
-- Identify the stage(s) that use `oc` commands.
-- Extract the same details as Step 1 (commands, flags, payloads, order, variables).
+### Step 2: For EACH mismatch you previously identified, do the following:
 
-### Step 3: Compare — Field by Field
-Compare the oc stage in Jenkinsfile against sampleJenkinsfile. Check EACH of the following:
+a) Find the EXACT lines in `Jenkinsfile` that are wrong or missing.
+b) Find the CORRECT version from `sampleJenkinsfile`.
+c) Apply the fix to `Jenkinsfile` so it matches the pattern in `sampleJenkinsfile`.
 
-1. **Pod/container setup**: Is `runInEphemeralPod` and `container` used the same way?
-2. **Credentials**: Are credentials loaded the same way (same credentialsId, same variable name, same type)?
-3. **oc patch commands — source**: Does the source patch match (type, binary, git, sourceSecret fields)?
-4. **oc patch commands — strategy**: Does the strategy patch match (dockerStrategy, buildArgs, all arg names and values)?
-5. **oc patch commands — output**: Does the output patch match (kind, name, pushSecret)?
-6. **oc start-build**: Is the start-build command identical (same flags like --from-dir, --follow, --wait)?
-7. **Variable names**: Are all variable references (like buildConfigName, imageRegistryPath, GIT_COMMIT) consistent?
-8. **Missing commands**: Are there any `oc` commands in sampleJenkinsfile that are MISSING from Jenkinsfile?
-9. **Extra commands**: Are there any `oc` commands in Jenkinsfile that do NOT exist in sampleJenkinsfile?
-10. **Order of execution**: Are the commands in the same order?
+Specifically check and fix these areas:
+- Pod and container setup (must match sampleJenkinsfile's pattern)
+- Credentials block (credentialsId, variable name, type must match)
+- Every `oc patch` command (source, strategy, output — JSON payloads must match)
+- `oc start-build` command (all flags must match)
+- Any missing `oc` commands that exist in sampleJenkinsfile but are absent in Jenkinsfile — ADD them
+- Any extra `oc` commands in Jenkinsfile that do NOT exist in sampleJenkinsfile — REMOVE them
+- Variable names and references (must be consistent with sampleJenkinsfile)
+- Order of commands (must match sampleJenkinsfile)
 
-### Step 4: Report
-For EACH of the 10 checks above, report:
-- ✅ MATCH — if Jenkinsfile matches sampleJenkinsfile
-- ❌ MISMATCH — if there is a difference. Show BOTH versions (from sampleJenkinsfile and Jenkinsfile) side by side.
-- ⚠️ NOT FOUND — if the check item doesn't exist in one of the files
+### Step 3: After applying all fixes, verify your work
+- Re-read the modified oc stage in `Jenkinsfile`.
+- Compare it one more time against `sampleJenkinsfile`.
+- Confirm every field matches. If anything still differs, fix it.
 
-Do NOT suggest fixes. Only report findings.
-Do NOT modify any file.
+### Step 4: Show a summary
+After all fixes are applied, show a summary table:
+
+| Gap Found | What Was Wrong | What You Changed |
+|-----------|---------------|-----------------|
+| ...       | ...           | ...             |
+
+## IMPORTANT
+- Do NOT invent new values. Every value must come from `sampleJenkinsfile`.
+- Do NOT change stages other than the oc build stage.
+- If a variable name differs between the two files (e.g., different buildConfig name),
+  use the variable name from `Jenkinsfile` but ensure it is used in the same PATTERN
+  as `sampleJenkinsfile`.
+- Apply the changes now. Do not just describe them.
 
 
 
