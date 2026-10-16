@@ -26,8 +26,51 @@ Please follow these rules for this chat:
 
 ---
 
-We have migrated our Jenkins server to corporate Jenkins and as part of that we need to migrate existing Jekins pipeline as well. I have @samplejenkins here which is already migrated and running in the new corporate Jenkins, whereas I have my existing Jenkins pipeline which is failing in the new corporate Jenkins with error @build.log. 
-I need you analyze the @samplejenkins file and then make the needful changes in our current jenkinsfile to make it working and also resolve the current error that we're facing. 
+You are a code reviewer. Follow these instructions exactly. Do NOT skip any step.
+
+## FILES
+- `sampleJenkinsfile` — This is a WORKING, PRODUCTION pipeline that uses `oc` (OpenShift CLI) to build and push container images. Treat this as the REFERENCE / ground truth.
+- `Jenkinsfile` — This is a WORK-IN-PROGRESS pipeline. It has a new stage that uses `oc` to build images. This stage needs to be validated against sampleJenkinsfile.
+
+## YOUR TASK
+
+### Step 1: Read sampleJenkinsfile
+- Read the ENTIRE sampleJenkinsfile.
+- Identify ALL stages that use `oc` commands (e.g., `oc patch`, `oc start-build`, `oc get`, etc.).
+- For each `oc` command found, note:
+  a) The exact command and its flags
+  b) The JSON patch payload (if any)
+  c) The order in which commands are executed
+  d) Any variables or credentials used
+
+### Step 2: Read Jenkinsfile
+- Read the ENTIRE Jenkinsfile.
+- Identify the stage(s) that use `oc` commands.
+- Extract the same details as Step 1 (commands, flags, payloads, order, variables).
+
+### Step 3: Compare — Field by Field
+Compare the oc stage in Jenkinsfile against sampleJenkinsfile. Check EACH of the following:
+
+1. **Pod/container setup**: Is `runInEphemeralPod` and `container` used the same way?
+2. **Credentials**: Are credentials loaded the same way (same credentialsId, same variable name, same type)?
+3. **oc patch commands — source**: Does the source patch match (type, binary, git, sourceSecret fields)?
+4. **oc patch commands — strategy**: Does the strategy patch match (dockerStrategy, buildArgs, all arg names and values)?
+5. **oc patch commands — output**: Does the output patch match (kind, name, pushSecret)?
+6. **oc start-build**: Is the start-build command identical (same flags like --from-dir, --follow, --wait)?
+7. **Variable names**: Are all variable references (like buildConfigName, imageRegistryPath, GIT_COMMIT) consistent?
+8. **Missing commands**: Are there any `oc` commands in sampleJenkinsfile that are MISSING from Jenkinsfile?
+9. **Extra commands**: Are there any `oc` commands in Jenkinsfile that do NOT exist in sampleJenkinsfile?
+10. **Order of execution**: Are the commands in the same order?
+
+### Step 4: Report
+For EACH of the 10 checks above, report:
+- ✅ MATCH — if Jenkinsfile matches sampleJenkinsfile
+- ❌ MISMATCH — if there is a difference. Show BOTH versions (from sampleJenkinsfile and Jenkinsfile) side by side.
+- ⚠️ NOT FOUND — if the check item doesn't exist in one of the files
+
+Do NOT suggest fixes. Only report findings.
+Do NOT modify any file.
+
 
 
 
