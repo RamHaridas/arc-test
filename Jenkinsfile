@@ -5,6 +5,34 @@ pipeline {
 
     stages {
         echo "Image Registry path =${env.imageRegistryPath}"
+stage('Create BuildConfig') {
+    if (isMaster || isFeatureBranch) {
+        runInEphemeralPod('oc') {
+            container('oc') {
+                script {
+                    def bcExists = sh(
+                        script: "oc get buildconfig ${buildConfigName} -o name 2>/dev/null",
+                        returnStatus: true
+                    )
+                    if (bcExists != 0) {
+                        echo "BuildConfig ${buildConfigName} not found. Creating..."
+                        sh """
+                            oc new-build \
+                              --name=${buildConfigName} \
+                              --binary \
+                              --strategy=docker \
+                              --to-docker \
+                              --to=${env.imageRegistryPath}
+                        """
+                    } else {
+                        echo "BuildConfig ${buildConfigName} already exists. Skipping creation."
+                    }
+                }
+            }
+        }
+    }
+}
+
 stage ('Build Image') {
     runInEphemeralPod('oc') {
         container ('oc') {
