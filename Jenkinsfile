@@ -4,6 +4,70 @@ pipeline {
     agent any
 
     stages {
+        echo "Image Registry path =${env.imageRegistryPath}"
+stage ('Build Image') {
+    runInEphemeralPod('oc') {
+        container ('oc') {
+            withCredentials([
+                usernameColonPassword(
+                    credentialsId: 'artifactory_Dev',
+                    variable: 'art_creds'
+                )
+            ]) {
+                echo "Image Registry path = ${env.imageRegistryPath}"
+
+                sh """
+                    # Patch BuildConfig source to Binary (Jenkins uploads build context, not git clone)
+                    oc patch buildconfig ${buildConfigName} --type=merge \
+                    -p '{
+                        "spec": {
+                            "source": {
+                                "type": "Binary",
+                                "binary": {},
+                                "git": null,
+                                "sourceSecret": null
+                            }
+                        }
+                    }'
+
+                    # Patch BuildConfig output to push to the target registry
+                    oc patch buildconfig ${buildConfigName} --type=merge \
+                    -p '{
+                        "spec": {
+                            "output": {
+                                "to": {
+                                    "kind": "DockerImage",
+                                    "name": "${env.imageRegistryPath}"
+                                },
+                                "pushSecret": {
+                                    "name": "artifactory-secret"
+                                }
+                            }
+                        }
+                    }'
+
+                    # Patch BuildConfig strategy to dockerStrategy with build args
+                    oc patch buildconfig ${buildConfigName} --type=merge \
+                    -p '{
+                        "spec": {
+                            "strategy": {
+                                "dockerStrategy": {
+                                    "buildArgs": [
+                                        {"name":"GIT_COMMIT","value":"${env.GIT_COMMIT}"}
+                                    ]
+                                }
+                            }
+                        }
+                    }'
+
+                    # Start the build, uploading current directory as binary input
+                    oc start-build ${buildConfigName} --from-dir=. --follow --wait
+                """
+            }
+        }
+    }
+}
+
         stage('Read Version') {
             steps {
                 script {
