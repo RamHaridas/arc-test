@@ -26,6 +26,8 @@ Please follow these rules for this chat:
 
 ---
 
+{{- include "ui.selectorLabels" (dict "context" . "app" "zelle") | nindent 4 }}
+
 You are a code editor. Follow these instructions exactly.
 
 ## CONTEXT
