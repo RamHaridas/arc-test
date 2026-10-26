@@ -26,11 +26,17 @@ Please follow these rules for this chat:
 
 ---
 
-1. are you certain that the harness pipeline is pulling wrong helm chart? did you read all the logs from /harnesslogs dir before reaching into this conclusion?
+Hi, 
 
-2. Elaborate this point in detail with code snippets.
+I have 2 directories in this workspace. mmh-data-lake and zelle-fraud-ocr-service. 
+mmh folder contains a bunch of python scripts and a Jenkinsfile for creating aws glue job of out these python scripts. 
+Please go through the mmh directory and gain a project context about it in order to make more sense on how and what it is doing.
 
-3. is this really required because the harness is supposed to handle that?
+Then, scan zelle directory. It contains a ASGI server application which is written in python. 
+Our task is to create this application as a AWS Glue job and then build Jenkins pipeline to deploy it. Currently we are in development face, so let's point everything to the dev environment. 
+
+I need you to analyze more on this and how this can be implemented. Refer to the Jenkins pipeline of mmh and then
+start with migration changes for zelle. 
 
 
 
