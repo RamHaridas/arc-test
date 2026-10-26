@@ -26,17 +26,12 @@ Please follow these rules for this chat:
 
 ---
 
-I have @Jenkinsfile here which has a stage to build helm chart. The helm chart is placed at charts/zelle-enabler. The jenkins pipeline builds the chart and pushes it jfrog whereas the harness pipeline @testharnesspipeline pulls this chart and deploys it to the k8s cluster. 
+1. are you certain that the harness pipeline is pulling wrong helm chart? did you read all the logs from /harnesslogs dir before reaching into this conclusion?
 
-The Jenkins pipeline builds the docker and helm, during build it tags docker with 2.0.0-RC<buildnumber>. Buildnumber here refers to the jenkins build number, and similarly helm chart is tagged as 2.0.0-RC<buildnumber>
+2. Elaborate this point in detail with code snippets.
 
-The harness pipeline is expected to accept chart version variable as input, where I as a user input 2.0.0-RC10 or whatever the buildnumber is. Then harness pipeline ensures that helm chart uses the correct image tag for the deployment.yaml via helm chart. This functionality was working fine until something changed causing this to fail. But now after installation the image is always being set to RC1 regardless of whatever input i pass. 
+3. is this really required because the harness is supposed to handle that?
 
-HARNESS K8s ERROR LOG:
-
-
-
-Please find the RCA of this issue and report back to me with possible fix.
 
 
 
