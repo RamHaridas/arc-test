@@ -26,61 +26,17 @@ Please follow these rules for this chat:
 
 ---
 
-{{- include "ui.selectorLabels" (dict "context" . "app" "zelle") | nindent 4 }}
+I have @Jenkinsfile here which has a stage to build helm chart. The helm chart is placed at charts/zelle-enabler. The jenkins pipeline builds the chart and pushes it jfrog whereas the harness pipeline @testharnesspipeline pulls this chart and deploys it to the k8s cluster. 
 
-You are a code editor. Follow these instructions exactly.
+The Jenkins pipeline builds the docker and helm, during build it tags docker with 2.0.0-RC<buildnumber>. Buildnumber here refers to the jenkins build number, and similarly helm chart is tagged as 2.0.0-RC<buildnumber>
 
-## CONTEXT
-You just compared `Jenkinsfile` against `sampleJenkinsfile` and found mismatches
-in the oc build stage. Now you must fix them.
+The harness pipeline is expected to accept chart version variable as input, where I as a user input 2.0.0-RC10 or whatever the buildnumber is. Then harness pipeline ensures that helm chart uses the correct image tag for the deployment.yaml via helm chart. This functionality was working fine until something changed causing this to fail. But now after installation the image is always being set to RC1 regardless of whatever input i pass. 
 
-## RULES
-1. `sampleJenkinsfile` is the REFERENCE. It is correct. Do NOT change it.
-2. `Jenkinsfile` is the file you must FIX. Apply changes ONLY to `Jenkinsfile`.
-3. The ONLY stage you may modify is the oc build/image stage. Do NOT touch any other stage.
-4. Do NOT delete or rewrite the entire stage. Make the MINIMUM changes needed to fix each gap.
+HARNESS K8s ERROR LOG:
 
-## YOUR TASK
 
-### Step 1: Re-read both files
-- Read `sampleJenkinsfile` fully. This is your source of truth.
-- Read `Jenkinsfile` fully. This is what you are fixing.
 
-### Step 2: For EACH mismatch you previously identified, do the following:
-
-a) Find the EXACT lines in `Jenkinsfile` that are wrong or missing.
-b) Find the CORRECT version from `sampleJenkinsfile`.
-c) Apply the fix to `Jenkinsfile` so it matches the pattern in `sampleJenkinsfile`.
-
-Specifically check and fix these areas:
-- Pod and container setup (must match sampleJenkinsfile's pattern)
-- Credentials block (credentialsId, variable name, type must match)
-- Every `oc patch` command (source, strategy, output — JSON payloads must match)
-- `oc start-build` command (all flags must match)
-- Any missing `oc` commands that exist in sampleJenkinsfile but are absent in Jenkinsfile — ADD them
-- Any extra `oc` commands in Jenkinsfile that do NOT exist in sampleJenkinsfile — REMOVE them
-- Variable names and references (must be consistent with sampleJenkinsfile)
-- Order of commands (must match sampleJenkinsfile)
-
-### Step 3: After applying all fixes, verify your work
-- Re-read the modified oc stage in `Jenkinsfile`.
-- Compare it one more time against `sampleJenkinsfile`.
-- Confirm every field matches. If anything still differs, fix it.
-
-### Step 4: Show a summary
-After all fixes are applied, show a summary table:
-
-| Gap Found | What Was Wrong | What You Changed |
-|-----------|---------------|-----------------|
-| ...       | ...           | ...             |
-
-## IMPORTANT
-- Do NOT invent new values. Every value must come from `sampleJenkinsfile`.
-- Do NOT change stages other than the oc build stage.
-- If a variable name differs between the two files (e.g., different buildConfig name),
-  use the variable name from `Jenkinsfile` but ensure it is used in the same PATTERN
-  as `sampleJenkinsfile`.
-- Apply the changes now. Do not just describe them.
+Please find the RCA of this issue and report back to me with possible fix.
 
 
 
