@@ -25,11 +25,11 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-1. fis.zelle.com 
-api.fis.zelle.com
-2. <ARN of NLB>
-3. yes use the zelle- prefix
-4. use latest. 
+1. reuse the IPs if our give IPs are matching with existing ones
+2. how come the existing ALB is working?
+3. keep health check as same as existing one
+4. go ahead with this
+5. don't hard-code. use it. 
 
 
 
