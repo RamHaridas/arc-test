@@ -25,11 +25,11 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-
-Hi, 
-
-I have a @yourtf.tf file which creates an application load balancer. I need to create a new ALB for zelle. This zelle application load balancer will be sitting infront of a NLB. Below are the private IPs of my NLB. Please analyze the existing script and create a new script in adhering to the same standard and pattern. Let me know if see any blockers.
-
+1. fis.zelle.com 
+api.fis.zelle.com
+2. <ARN of NLB>
+3. yes use the zelle- prefix
+4. use latest. 
 
 
 
