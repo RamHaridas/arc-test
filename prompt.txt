@@ -28,22 +28,7 @@ Please follow these rules for this chat:
 
 Hi, 
 
-I have a @Jenkinsfile here for building the Zelle UI application. 
-- I want you to read the Jenkins file and gain full context regarding the CI. 
-- Then read the chart directory to gain context regarding the helm chart
-- Then read the @harness.yaml to gain context regarding the CD pipeline.
-
-Based on the above knowledge that you have gained, I need you to create a developer documentation on this Zelle UI CI/CD. 
-Document below things:
-- Start with basic intro/summary of the pipeline
-- Then explain what each stages do
-- Explain the flow of control between these stages, preferably use diagrams
-- Then talk a little bit about docker and helm that is being built here. no need go in very depth.
-- Then explain the harness CD part, on how the deployment works, and the stages involved.
-
-NOTE: Please DO NOT use very mechanical language. Keep in mind that this doc is intended for a human to read. 
-Make this doc simple and clean.
-
+I have a @yourtf.tf file which creates an application load balancer. I need to create a new ALB for zelle. This zelle application load balancer will be sitting infront of a NLB. Below are the private IPs of my NLB. Please analyze the existing script and create a new script in adhering to the same standard and pattern. Let me know if see any blockers.
 
 
 
