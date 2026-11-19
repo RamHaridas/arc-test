@@ -25,11 +25,29 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
-1. reuse the IPs if our give IPs are matching with existing ones
-2. how come the existing ALB is working?
-3. keep health check as same as existing one
-4. go ahead with this
-5. don't hard-code. use it. 
+Hi, 
 
+This workspace contains dms.tf inside qa/mmh_data_lake for creating data management system. Please scan through the it and understand how it is wired. 
+
+We need to create terraform script for creating a database and a DMS set as target to it. Our DMS will have a oracle DB as source and AWS DB as destination. So the creds of source DB can be read same way as existing DMS script is doing. 
+
+Ensure that the changes are adhering to existing coding style and patterns. 
+
+### Requirements:
+1. **Strict Style & Pattern Adherence:**
+   - Mirror the exact resource naming conventions, `locals`, `tags`, `depends_on` structure, security group rules, and secret management patterns (e.g., AWS Secrets Manager / SSM Parameter Store) used in `@dms.tf` and the rest of the repo.
+   - Reuse existing shared IAM roles (such as `dms-vpc-role` or `dms-cloudwatch-logs-role`), subnet groups, or KMS keys if they are already defined or referenced in the workspace instead of duplicating them.
+
+2. **Target AWS Database Creation:**
+   - Provision the destination AWS RDS/Aurora database instance (configure for `<TARGET_ENGINE: e.g., postgres / aurora-postgresql / oracle-ee>`), matching the workspace's standard RDS sizing, `gp3` storage, parameter/option groups, subnet groups, backup/encryption settings, and security groups.
+   - Ensure security group ingress rules explicitly allow traffic from the DMS replication instance to the target DB port.
+
+3. **AWS DMS Configuration (`mmhdms.tf`):**
+   - Provision or reference the DMS Replication Instance and Subnet Group matching `@dms.tf`.
+   - Create the **Source Endpoint** (`engine_name = "oracle"`) pulling host, port, SID/service name, and credentials cleanly via variables or secrets matching repo conventions.
+   - Create the **Target Endpoint** dynamically wired to the newly created AWS database's endpoint address, port, database name, and credentials.
+   - Create the **Replication Task** (`migration_type = "full-load-and-cdc"` with `start_replication_task = false`, CloudWatch logging, and table mappings/validation settings structured like `@dms.tf`).
+
+Before writing the code, briefly list the existing workspace patterns and shared resources you found in `@dms.tf` so I can confirm the target engine and any variable defaults.
 
 
