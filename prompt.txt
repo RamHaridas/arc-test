@@ -26,6 +26,7 @@ Please follow these rules for this chat:
 
 ---
 
-
+Read @changes.diff to gain context regarding the code changes that we've made to create a zelle uat db. Now we need to update the respective security groups associated to the DB to add new ips in the inbound rule. 
+We have to ensure that below IPs are added to the inbound rule of our DBs SG: 
 
 
