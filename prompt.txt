@@ -25,8 +25,14 @@ Please follow these rules for this chat:
 9) If web evidence conflicts with local evidence, call out the conflict clearly.
 
 ---
+Read @changes.diff to gain context regarding the code changes that we've made to create a zelle uat db. Then read apply.diff to understand the code changes that were made to improve the performance of SQL queries in these DBs. we need to apply same fix in our zelle DB as well. Please make the changes accordingly to our zelle uat db. 
+
+---
 
 Read @changes.diff to gain context regarding the code changes that we've made to create a zelle uat db. Now we need to update the respective security groups associated to the DB to add new ips in the inbound rule. 
 We have to ensure that below IPs are added to the inbound rule of our DBs SG: 
+<YOUR-IP-HERE>
+<YOUR-IP-HERE>
+<YOUR-IP-HERE>
 
 
